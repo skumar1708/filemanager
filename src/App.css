@@ -44,6 +44,7 @@
 .explorer {
   list-style: none;
   text-align: left;
+  max-width: 300px;
 }
 
 .material-icons {
@@ -53,4 +54,31 @@
 
 .pointer-cursor {
   cursor: pointer;
+}
+
+.explorer li {
+  margin-left: 10px;
+  padding: 5px;;
+  /* Ensure spans are initially hidden */
+}
+
+.explorer li:hover{
+  background: rgb(238, 234, 234)
+}
+
+.explorer li .add-tem {
+  visibility: hidden; /* or display: none; */
+}
+
+.explorer li:hover .add-tem {
+  visibility: visible; /* or display: inline;  */
+}
+
+/* Optional: Style the spans when visible */
+.explorer li:hover span.add-tem {
+  cursor: pointer; /* Indicate clickable elements */
+  /* Add any other styling you want for the spans on hover */
+  /* For example: */
+  color: blue;
+  font-weight: bold;
 }
