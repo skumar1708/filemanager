@@ -1,5 +1,13 @@
 .App {
   text-align: center;
+  display: flex ;
+  flex-direction: row;
+  min-height: 100vh;
+}
+
+.open-files-container {
+  width: calc(100% - 210px);
+  border-left: 1px solid #c5c0c0;
 }
 
 .App-logo {
@@ -82,3 +90,32 @@
   color: blue;
   font-weight: bold;
 }
+
+.opened-files-ul {
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+  padding-left: 0;
+  background-color: #eadede;
+  border: 1px solid rgb(82, 81, 81);
+}
+
+.current-opened-file {
+  width: 200px;
+  background-color: #eadede;
+  border-right: 1px solid rgb(82, 81, 81);
+  padding-bottom: 6px;
+  cursor: pointer;
+}
+
+.close-file {
+  visibility: hidden;
+  float: right;
+  right: 10px;
+  position: relative;
+  cursor: pointer;
+}
+.current-opened-file:hover .close-file {
+  visibility: visible;
+}
+

@@ -12,6 +12,8 @@ const FILES_DATA = JSON.parse(sessionStorage.getItem("tree-data")) || [{
   children:[]
 }];
 
+const OPENED_TABS = [];
+
 function App() {
   const [currItem, setCurrItem] = useState(null);
   const addItem = (item) => {
@@ -50,20 +52,42 @@ function App() {
   const toggleExpand = (item) => {
 
     item.showChildren = !item.showChildren
-    refreshSTructure(false);
+    refreshSTructure(true);
     
+  }
+
+  const [openedFiles, setOpenedFiles] = useState(OPENED_TABS)
+  const openThisFile = (file) => {
+    let findIndex = -1;
+    for(let index in OPENED_TABS){
+      if (OPENED_TABS[index].name === file.name) {
+        findIndex = index;
+      }
+      OPENED_TABS[index].isOpened = false;
+    }
+
+    file.isOpened = true;
+    if (findIndex === -1) {
+      OPENED_TABS.push(file);
+    }
+
+
+    setOpenedFiles(Array.from(OPENED_TABS));
   }
 
   const generateItemJSX = (data) => {
     
     return data.reduce((acc, next) => {
       acc.push(
-        <li key={`${next.path}/${next.name}`} style={{marginLeft: 10 * next.level, padding: "5px"}} onClick={() => toggleExpand(next)}>
-          <span className="material-icons material-symbols-outlined pointer-cursor">
+        <li key={`${next.path}/${next.name}`} style={{marginLeft: 10 * next.level, padding: "5px"}} onClick={() => {
+          if(next.type === "file") return;
+          return toggleExpand(next);
+        }}>
+          {next.type === "folder" && <span className="material-icons material-symbols-outlined pointer-cursor">
             {next?.showChildren? "keyboard_arrow_down" : "keyboard_arrow_right"}
-          </span>
-              {next.name}&nbsp;&nbsp;
-          <span className="add-tem" onClick={(evt) => {evt.stopPropagation(); return addItem(next)}}>+</span>
+          </span>}
+              <span onClick={() => openThisFile(next)}>{next.name}&nbsp;&nbsp;</span>
+          {next.type === "folder" && <span className="add-tem" onClick={(evt) => {evt.stopPropagation(); return addItem(next)}}>+</span>}
           &nbsp;
           <span className="add-tem" onClick={(evt) => {evt.stopPropagation(); return deleteItem(FILES_DATA, next.name)}}>x</span>
         </li>)
@@ -87,7 +111,7 @@ function App() {
     updatedCurrItem.children.push({
       node: "child",
       name: itemName,
-      type: "folder",
+      type: selectedOption,
       showChildren: true,
       path: currItem.path + itemName +"/",
       level: currItem.level + 1,
@@ -101,15 +125,59 @@ function App() {
     refreshSTructure(true);
   }
 
+  const [selectedOption, setSelectedOption] = useState("folder");
+  const handleOptionChange = (event) => {
+    setSelectedOption(event.target.value);
+  };
+
+
+  const getOpenFileTabs = () => {
+    return (
+      <ul className="opened-files-ul">
+        {OPENED_TABS?.map(file => {
+          return <li className="current-opened-file">{file.name} <span className="close-file">x</span></li>
+        })}
+      </ul>
+    );
+  }
+
   return (
-    <div className="App">
-      <ul className='explorer'>{itemJSX}</ul>
-      <dialog id="myDialog">
-        <h4>Add file/folder to</h4>
-        <p>{currItem?.path}</p>
-        <input type="text" value={itemName} onChange={(evt) => handleCurrItem(evt.target.value)}/>
-        <button onClick={addAndClose}>ADD</button>
-      </dialog>
+    <div>
+      <div className="editor-header"></div>
+      <div className="App flex-container">
+        <ul className='explorer'>{itemJSX}</ul>
+        <dialog id="myDialog">
+          <h4>Add file/folder to</h4>
+          <p>{currItem?.path}</p>
+          <div style={{display: "flex", flexDirection: "row"}}>
+              <div>
+                <input 
+                  type="radio" 
+                  value="folder" 
+                  checked={selectedOption === 'folder'} 
+                  onChange={handleOptionChange} 
+                />
+                <label htmlFor="folder">Folder </label>
+              </div>
+              <div>
+                <input 
+                  type="radio" 
+                  value="file" 
+                  checked={selectedOption === 'file'} 
+                  onChange={handleOptionChange} 
+                />
+                <label htmlFor="file">File</label>
+              </div>
+            </div>
+          <input type="text" value={itemName} onChange={(evt) => handleCurrItem(evt.target.value)}/>
+          <button onClick={addAndClose}>ADD</button>
+        </dialog>
+
+        <div className="open-files-container">
+          {getOpenFileTabs()}
+          {/* {getFileEditor()} */}
+        </div>
+    </div>
     </div>
   );
 }
